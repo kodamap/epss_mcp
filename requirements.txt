@@ -1,0 +1,7 @@
+OpenAI
+httpx
+fastapi
+mcp
+mcp[cli]>=1.2.0
+anthropic
+python-dotenv
