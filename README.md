@@ -1,75 +1,63 @@
-# EPSS MCP Server
+# 1. EPSS MCP Server
+
+This repository provides an EPSS MCP Server that allows you to retrieve EPSS scores and percentiles for a single CVE or multiple CVEs.
+
+- [1. EPSS MCP Server](#1-epss-mcp-server)
+- [2. Features](#2-features)
+- [3. Run MCP Server on Docker](#3-run-mcp-server-on-docker)
+- [4. Installation](#4-installation)
+  - [4.1. Streamable HTTP, SSE](#41-streamable-http-sse)
+  - [4.2. Stdio](#42-stdio)
+- [5. Tool Examples](#5-tool-examples)
+  - [5.1. Get EPSS Score of single CVE](#51-get-epss-score-of-single-cve)
+  - [5.2. Get EPSS Score of multiple CVEs](#52-get-epss-score-of-multiple-cves)
+  - [5.3. Get EPSS Score of multiple CVEs with time series](#53-get-epss-score-of-multiple-cves-with-time-series)
+  - [5.4. Get top 5 CVEs with the highest EPSS scores](#54-get-top-5-cves-with-the-highest-epss-scores)
+- [6. Reference](#6-reference)
 
 
 **Note:** The major design of code in this repository is based on [EPSS-MCP](https://github.com/jgamblin/EPSS-MCP).
 
 
-## Features
+# 2. Features
 
-EPSS MCP Server has the following functions.
+EPSS MCP Server provides the following features:
 
 - Retrieve vulnerability details (including description, CWE, and CVSS scores) from the NVD API, and EPSS scores and percentiles from the EPSS API.
 - Retrieve EPSS scores for multiple CVEs.
 - Retrieve the EPSS time series data for a single CVE.
 - Retrieve the top N CVEs with the highest EPSS scores.
 
+# 3. Run MCP Server on Docker
 
-## Run MCP Server
-
-### Requirements
-
-Prepare a Python virtual environment using uv. See [uv](https://docs.astral.sh/uv/getting-started/installation/#installation-methods) for more details. 
-```sh
-curl -LsSf https://astral.sh/uv/install.sh | sh
-``` 
-
-
-
-```sh
-uv sync
-. .venv/bin/activate
-```
-
-
-### Stdio
-```sh
-uv run client/client.py epss-mcp/epss_mcp.py
-```
-
-### Streamable HTTP
-```sh
-uv run epss_mcp.py --transport http
-```
-
-### SSE (Deprecated)
-```sh
-uv run epss_mcp.py --transport sse
-```
-
->Windsurf supports two transport types for MCP servers: stdio and /sse
-https://docs.windsurf.com/windsurf/cascade/mcp
-
-## Run MCP Server with Docker
-
-Run the MCP server with http transport
+Run the MCP server with Streamable HTTP transport
 
 ```sh
 cd epss-mcp
-docke build -t epss-mcp .
+docker build -t epss-mcp .
 docker run -d -p 8000:8000 epss-mcp
 ```
 
-## Installtion
+**Note:** If you use SSE transport, edit `Dockerfile` like this.
 
-### Streamable HTTP, SSE
+```dockerfile
+# Run the MCP server with http transport
+CMD ["python3", "epss_mcp.py", "--transport", "sse"]
+```
 
-__Corsor__
+# 4. Installation
+
+## 4.1. Streamable HTTP, SSE
+
+__Cursor__
+
+`url` is your server URL or IP address.
 
 ```json
 {
   "mcpServers": {
     "epss-mcp": {
-      "url": "http://localhost:8000/mcp"
+      "url": "http://<your server ip>:8000/mcp"
     }
   }
 }
@@ -77,19 +65,38 @@ __Corsor__
 
 __Windsurf__
 
+`serverUrl` is your server URL or IP address. 
+
 ```json
 {
   "mcpServers": {
     "epss-mcp": {
-      "serverUrl": "http://localhost:8000/sse"
+      "serverUrl": "http://<your server ip>:8000/sse"
     }
   }
 }
 ```
+>Windsurf supports two transport types for MCP servers: stdio and /sse
+https://docs.windsurf.com/windsurf/cascade/mcp
 
-### Stdio
+## 4.2. Stdio
 
-__Corsor, Windsurf__
+Prepare a Python virtual environment using uv. See [uv](https://docs.astral.sh/uv/getting-started/installation/#installation-methods) for more details. 
+```sh
+curl -LsSf https://astral.sh/uv/install.sh | sh
+``` 
+
+```sh
+uv sync
+. .venv/bin/activate
+```
+
+```sh
+uv run epss-mcp/epss_mcp.py
+```
+
+__Cursor, Windsurf__
+
 ```json
 {
   "mcpServers": {
@@ -105,14 +112,19 @@ __Corsor, Windsurf__
 
 
 
-## Examples
+
+# 5. Tool Examples
 
 This example is simply demonstrating how each function works, so it's executed using a Python script as the MCP client.
 (You can use them via an LLM through editors like Cursor or Windsurf.)
 
-**※MCP client for testing purposes. (Gemini API Key required)**
+**Note:** MCP client for testing purposes. ([Gemini API Key](https://ai.google.dev/gemini-api/docs/api-key?hl=ja) required)
 
-Start mcp server with stdio transport
+```sh
+export GOOGLE_API_KEY=<your api key>
+```
+
+Start the MCP server with stdio transport
 
 ```sh
 $ uv run client/client.py epss-mcp/epss_mcp.py
@@ -125,7 +137,7 @@ Type your queries or `quit` to exit.
 Query: 
 ```
 
-### Get EPSS Score of single CVE
+## 5.1. Get EPSS Score of single CVE
 ```sh
 Query: Get EPSS of CVE-2025-33053
 > Thinking...
@@ -134,7 +146,7 @@ Query: Get EPSS of CVE-2025-33053
 The EPSS score for CVE-2025-33053 is 0.41763, and the percentile is 97.264.
 ```
 
-### Get EPSS Score of multiple CVEs
+## 5.2. Get EPSS Score of multiple CVEs
 
 ```sh
 Query: Get EPSS of CVE-2025-33053, CVE-2025-21298
@@ -144,7 +156,7 @@ Query: Get EPSS of CVE-2025-33053, CVE-2025-21298
 CVE-2025-33053 has an EPSS score of 0.41763 and is in the 97.264 percentile. CVE-2025-21298 has an EPSS score of 0.70558 and is in the 98.593 percentile.
 ```
 
-### Get EPSS Score of multiple CVEs with time series
+## 5.3. Get EPSS Score of multiple CVEs with time series
 
 ```sh
 Query: Get time series of CVE-2025-33053 with table format
@@ -169,7 +181,7 @@ Here is the time series data for CVE-2025-33053 in a table format:
 | 2025-06-11 | 0.54359000 | 0.97862000 |
 ```
 
-### Get top 5 CVEs with the highest EPSS scores
+## 5.4. Get top 5 CVEs with the highest EPSS scores
 
 ```sh
 uv run client_stdio.py ../epss-mcp/epss_mcp.py --top_n 5
@@ -186,7 +198,7 @@ CVE-2018-7600, EPSS score: 0.94489, EPSS percentile: 99.99900000000001
 ```
 
 
-## Reference
+# 6. Reference
 
 - https://github.com/jgamblin/EPSS-MCP
 - https://nvd.nist.gov/developers/vulnerabilities
