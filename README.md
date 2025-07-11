@@ -1,6 +1,5 @@
 # 1. EPSS MCP Server
 
-This repository provides an EPSS MCP Server that allows you to retrieve EPSS scores and percentiles for a single CVE or multiple CVEs.
 
 - [1. EPSS MCP Server](#1-epss-mcp-server)
 - [2. Features](#2-features)
@@ -91,10 +90,6 @@ uv sync
 . .venv/bin/activate
 ```
 
-```sh
-uv run epss-mcp/epss_mcp.py
-```
-
 __Cursor, Windsurf__
 
 ```json
@@ -109,8 +104,6 @@ __Cursor, Windsurf__
   }
 }
 ```
-
-
 
 
 # 5. Tool Examples
