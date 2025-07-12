@@ -18,22 +18,6 @@ load_dotenv()
 MODEL_NAME = "gemini-2.0-flash"
 MAX_TOKENS = 1000
 
-def convert_schema_types_to_uppercase(schema):
-    """Recursively convert JSON schema type values to uppercase."""
-    if isinstance(schema, dict):
-        new_schema = {}
-        for key, value in schema.items():
-            if key == 'type' and isinstance(value, str):
-                new_schema[key] = value.upper()
-            else:
-                new_schema[key] = convert_schema_types_to_uppercase(value)
-        return new_schema
-    elif isinstance(schema, list):
-        return [convert_schema_types_to_uppercase(item) for item in schema]
-    else:
-        return schema
-
-
 class MCPClient:
     def __init__(self):
         self.session: ClientSession | None = None
