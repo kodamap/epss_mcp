@@ -34,7 +34,8 @@ Run the MCP server with Streamable HTTP transport
 ```sh
 cd epss-mcp
 docker build -t epss-mcp .
-docker run -d -p 8000:8000 epss-mcp
+# MCP server started to prevent outside connections for security reasons.
+docker run -d -p 127.0.0.1:8000:8000 epss-mcp
 ```
 
 **Note:** If you use SSE transport, edit `Dockerfile` like this.
