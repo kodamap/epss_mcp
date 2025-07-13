@@ -17,5 +17,6 @@ ENV FASTMCP_PORT=8000
 # Expose port 8000 for the MCP server
 EXPOSE 8000
 
-# Run the MCP server with http transport
-CMD ["python3", "epss_mcp.py", "--transport", "http"]
+# Run the MCP server with stdio transport
+# (Available options: stdio, sse, http)
+CMD ["python3", "epss_mcp.py", "--transport", "stdio"]

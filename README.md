@@ -5,8 +5,8 @@
 - [2. Features](#2-features)
 - [3. Run MCP Server on Docker](#3-run-mcp-server-on-docker)
 - [4. Installation](#4-installation)
-  - [4.1. Streamable HTTP, SSE](#41-streamable-http-sse)
-  - [4.2. Stdio](#42-stdio)
+  - [4.1. Stdio](#41-stdio)
+  - [4.2. Streamable HTTP, SSE](#42-streamable-http-sse)
 - [5. Tool Examples](#5-tool-examples)
   - [5.1. Get EPSS Score of single CVE](#51-get-epss-score-of-single-cve)
   - [5.2. Get EPSS Score of multiple CVEs](#52-get-epss-score-of-multiple-cves)
@@ -29,56 +29,40 @@ EPSS MCP Server provides the following features:
 
 # 3. Run MCP Server on Docker
 
-Run the MCP server with Streamable HTTP transport
+__Note:__ If you want to change transport type, edit `Dockerfile` like this.
+
+```sh
+# Stdio transport(Default)
+CMD ["python3", "epss_mcp.py", "--transport", "stdio"]
+# SSE transport
+CMD ["python3", "epss_mcp.py", "--transport", "sse"]
+# Streamable HTTP transport
+CMD ["python3", "epss_mcp.py", "--transport", "http"]
+```
+
+Build docker image
 
 ```sh
 cd epss-mcp
 docker build -t epss-mcp .
-docker run -d -p 8000:8000 epss-mcp
 ```
 
-**Note:** If you use SSE transport, edit `Dockerfile` like this.
+Run MCP server
 
-```dockerfile
-# Run the MCP server with http transport
-CMD ["python3", "epss_mcp.py", "--transport", "sse"]
+```sh
+# Stdio transport
+docker run --rm -i epss-mcp
+
+# SSE transport (Access from localhost only is recommended)
+docker run -d -p 127.0.0.1:8000:8000 epss-mcp
+
+# Streamable HTTP transport (Access from localhost only is recommended)
+docker run -d -p 127.0.0.1:8000:8000 epss-mcp
 ```
 
 # 4. Installation
 
-## 4.1. Streamable HTTP, SSE
-
-__Cursor__
-
-`url` is your server URL or IP address.
-
-```json
-{
-  "mcpServers": {
-    "epss-mcp": {
-      "url": "http://<your server ip>:8000/mcp"
-    }
-  }
-}
-```
-
-__Windsurf__
-
-`serverUrl` is your server URL or IP address. 
-
-```json
-{
-  "mcpServers": {
-    "epss-mcp": {
-      "serverUrl": "http://<your server ip>:8000/sse"
-    }
-  }
-}
-```
->Windsurf supports two transport types for MCP servers: stdio and /sse
-https://docs.windsurf.com/windsurf/cascade/mcp
-
-## 4.2. Stdio
+## 4.1. Stdio
 
 Prepare a Python virtual environment using uv. See [uv](https://docs.astral.sh/uv/getting-started/installation/#installation-methods) for more details. 
 ```sh
@@ -96,14 +80,49 @@ __Cursor, Windsurf__
 {
   "mcpServers": {
     "epss-mcp": {
-      "command" : "<your python path>/python",
+      "command": "docker",
       "args": [
-        "<script path>/epss_mcp.py"
+        "run",
+        "--rm",
+        "-i",
+        "epss-mcp"
       ]
     }
   }
 }
 ```
+
+
+## 4.2. Streamable HTTP, SSE
+
+__Cursor__
+
+```json
+{
+  "mcpServers": {
+    "epss-mcp": {
+      "url": "http://localhost:8000/mcp"
+    }
+  }
+}
+```
+
+__Windsurf__
+
+`serverUrl` is your server URL or IP address. 
+
+```json
+{
+  "mcpServers": {
+    "epss-mcp": {
+      "serverUrl": "http://localhost:8000/sse"
+    }
+  }
+}
+```
+>Windsurf supports two transport types for MCP servers: stdio and /sse
+https://docs.windsurf.com/windsurf/cascade/mcp
+
 
 
 # 5. Tool Examples
@@ -196,6 +215,3 @@ CVE-2018-7600, EPSS score: 0.94489, EPSS percentile: 99.99900000000001
 - https://github.com/jgamblin/EPSS-MCP
 - https://nvd.nist.gov/developers/vulnerabilities
 - https://www.first.org/epss/api
-
-
-
